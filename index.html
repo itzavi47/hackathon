@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnSphere - Fun Learning Games</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #FDF6E3;
+            color: #586E75;
+            font-family: 'Inter', sans-serif;
+        }
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .card {
+            background-color: #EEE8D5;
+            border: 1px solid #D8D0C0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #268BD2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1A6B9A;
+        }
+        .btn-secondary {
+            background-color: #6C71C4;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #565AA1;
+        }
+        #game-modal {
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+             background-color: #FDF6E3;
+             min-height: 400px;
+        }
+        .hidden {
+            display: none;
+        }
+        #offline-indicator {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 1000;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <div id="app" class="main-container">
+
+        <header class="text-center py-8">
+            <h1 class="text-5xl font-bold text-[#CB4B16]" style="font-family: 'Pacifico', cursive;">LearnSphere</h1>
+            <p class="text-lg mt-2 text-[#657B83]">A world of learning through fun and games!</p>
+            <div id="user-info" class="text-sm mt-2 text-[#657B83]">User ID: Loading...</div>
+        </header>
+
+        <main id="main-content">
+            <section id="features-section" class="flex justify-center items-center space-x-4 mb-8">
+                <button id="daily-bonus-btn" class="btn btn-secondary flex-1 max-w-xs">Claim Daily Bonus</button>
+                <button id="leaderboard-btn" class="btn btn-primary flex-1 max-w-xs">View Leaderboard</button>
+            </section>
+            
+            <section id="leaderboard-view" class="hidden">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#859900]">Leaderboard</h2>
+                <div id="leaderboard-list" class="bg-white p-6 rounded-lg shadow-md">
+                    <p class="text-center text-[#586E75]">Loading leaderboard...</p>
+                </div>
+                <button id="back-from-leaderboard" class="btn btn-secondary mt-4">Back to Grades</button>
+            </section>
+            
+            <section id="grade-selection">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#859900]">Select Your Grade</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class6">
+                        <div class="text-6xl mb-4">🏫</div>
+                        <h3 class="text-2xl font-bold text-[#D33682] mb-2">Class 6</h3>
+                        <p class="text-[#586E75]">Start your learning journey with games tailored for Class 6.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class7">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-2xl font-bold text-[#2AA198] mb-2">Class 7</h3>
+                        <p class="text-[#586E75]">Explore new challenges for Class 7 students.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class8">
+                        <div class="text-6xl mb-4">🔬</div>
+                        <h3 class="text-2xl font-bold text-[#B58900] mb-2">Class 8</h3>
+                        <p class="text-[#586E75]">Engage with advanced topics for Class 8.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class9">
+                        <div class="text-6xl mb-4">📘</div>
+                        <h3 class="text-2xl font-bold text-[#D33682] mb-2">Class 9</h3>
+                        <p class="text-[#586E75]">Challenge yourself with advanced topics for Class 9.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class10">
+                        <div class="text-6xl mb-4">💡</div>
+                        <h3 class="text-2xl font-bold text-[#2AA198] mb-2">Class 10</h3>
+                        <p class="text-[#586E75]">Boost your knowledge with games for Class 10.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class11">
+                        <div class="text-6xl mb-4">✍️</div>
+                        <h3 class="text-2xl font-bold text-[#B58900] mb-2">Class 11</h3>
+                        <p class="text-[#586E75]">Sharpen your skills with puzzles for Class 11.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-grade" data-grade="class12">
+                         <div class="text-6xl mb-4">🎓</div>
+                        <h3 class="text-2xl font-bold text-[#D33682] mb-2">Class 12</h3>
+                        <p class="text-[#586E75]">Prepare for your finals with games designed for Class 12.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="game-selection" class="hidden">
+                 <h2 class="text-3xl font-bold text-center mb-8 text-[#859900]">Choose a Subject</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-game" data-subject="math">
+                        <div class="text-6xl mb-4">🧮</div>
+                        <h3 class="text-2xl font-bold text-[#D33682] mb-2">Math Mania</h3>
+                        <p class="text-[#586E75]">Sharpen your calculation skills with quick-fire arithmetic challenges.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-game" data-subject="vocabulary">
+                         <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-2xl font-bold text-[#2AA198] mb-2">Vocabulary Voyage</h3>
+                        <p class="text-[#586E75]">Unscramble words and expand your vocabulary in this exciting word puzzle.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg text-center cursor-pointer select-game" data-subject="science">
+                         <div class="text-6xl mb-4">🔬</div>
+                        <h3 class="text-2xl font-bold text-[#B58900] mb-2">Science Spinner</h3>
+                        <p class="text-[#586E75]">Test your knowledge of the natural world with fun science trivia.</p>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button id="back-to-grades-btn" class="btn btn-secondary">Back to Grades</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="game-modal" class="fixed inset-0 w-full h-full z-50 items-center justify-center hidden">
+        <div class="modal-content w-11/12 md:w-2/3 lg:w-1/2 max-w-4xl p-8 rounded-lg shadow-2xl relative flex flex-col">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-3xl font-bold text-[#657B83]">&times;</button>
+            <div id="game-content" class="flex-grow flex flex-col items-center justify-center text-center">
+            </div>
+        </div>
+    </div>
+    
+    <div id="offline-indicator" class="bg-gray-400 text-white opacity-0">
+        <span>Connecting...</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, query, getDocs, onSnapshot, orderBy, limit, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        setLogLevel('debug');
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const gradeSelection = document.getElementById('grade-selection');
+        const gameSelection = document.getElementById('game-selection');
+        const gameModal = document.getElementById('game-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const gameContent = document.getElementById('game-content');
+        const leaderboardView = document.getElementById('leaderboard-view');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const dailyBonusBtn = document.getElementById('daily-bonus-btn');
+        const leaderboardBtn = document.getElementById('leaderboard-btn');
+        const backFromLeaderboardBtn = document.getElementById('back-from-leaderboard');
+        const backToGradesBtn = document.getElementById('back-to-grades-btn');
+        const userInfoEl = document.getElementById('user-info');
+        
+        let userId;
+        let currentGrade;
+        let currentSubject;
+        let score = 0;
+        let currentLevel = 1;
+        let gameTimer;
+        
+        function getPrivateDataCollection(collectionName) {
+            return collection(db, `artifacts/${appId}/users/${userId}`, collectionName);
+        }
+        
+        function getPublicDataCollection(collectionName) {
+            return collection(db, `artifacts/${appId}/public/data`, collectionName);
+        }
+        
+        async function signIn() {
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                userInfoEl.textContent = `User ID: ${userId}`;
+                checkDailyBonus();
+            } else {
+                userInfoEl.textContent = `User ID: Not authenticated`;
+            }
+        });
+        
+        signIn();
+
+        async function getProgress() {
+            if (!userId) return { levels: {} };
+            const progressDocRef = doc(getPrivateDataCollection('app_data'), 'progress');
+            const progressSnap = await getDoc(progressDocRef);
+            if (progressSnap.exists()) {
+                return progressSnap.data();
+            }
+            return { levels: {} };
+        }
+        
+        async function updateProgress(subject, level) {
+            if (!userId) return;
+            const progressDocRef = doc(getPrivateDataCollection('app_data'), 'progress');
+            const progressData = await getProgress();
+            progressData.levels[`${currentGrade}_${subject}`] = level;
+            await setDoc(progressDocRef, progressData, { merge: true });
+        }
+        
+        async function checkDailyBonus() {
+            if (!userId) return;
+            const bonusDocRef = doc(getPrivateDataCollection('app_data'), 'dailyBonus');
+            const bonusSnap = await getDoc(bonusDocRef);
+            const today = new Date().toDateString();
+            
+            if (bonusSnap.exists()) {
+                const lastClaim = bonusSnap.data().lastClaim;
+                if (lastClaim === today) {
+                    dailyBonusBtn.textContent = 'Bonus Claimed Today!';
+                    dailyBonusBtn.disabled = true;
+                } else {
+                    dailyBonusBtn.textContent = 'Claim Daily Bonus!';
+                    dailyBonusBtn.disabled = false;
+                }
+            } else {
+                dailyBonusBtn.textContent = 'Claim Daily Bonus!';
+                dailyBonusBtn.disabled = false;
+            }
+        }
+        
+        async function claimDailyBonus() {
+            if (!userId) return;
+            const bonusDocRef = doc(getPrivateDataCollection('app_data'), 'dailyBonus');
+            await setDoc(bonusDocRef, { lastClaim: new Date().toDateString() });
+            score += 10;
+            dailyBonusBtn.textContent = 'Bonus Claimed Today!';
+            dailyBonusBtn.disabled = true;
+        }
+
+        async function updateLeaderboard(newScore) {
+            if (!userId) return;
+            const leaderboardRef = getPublicDataCollection('leaderboard');
+            await setDoc(doc(leaderboardRef, userId), {
+                userId: userId,
+                score: newScore,
+                lastUpdated: new Date()
+            });
+        }
+        
+        async function fetchLeaderboard() {
+            leaderboardList.innerHTML = '<p class="text-center text-[#586E75]">Loading leaderboard...</p>';
+            const leaderboardRef = getPublicDataCollection('leaderboard');
+            const q = query(leaderboardRef, orderBy('score', 'desc'), limit(10));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                leaderboardList.innerHTML = '<p class="text-center text-[#586E75]">No scores yet. Be the first!</p>';
+                return;
+            }
+            
+            let listHtml = `<ol class="list-decimal list-inside space-y-2">`;
+            querySnapshot.forEach((doc, index) => {
+                const data = doc.data();
+                const userText = data.userId.substring(0, 8) + '...';
+                const isCurrentUser = data.userId === userId;
+                listHtml += `<li class="${isCurrentUser ? 'font-bold text-[#CB4B16]' : ''}">${userText}: ${data.score}</li>`;
+            });
+            listHtml += `</ol>`;
+            leaderboardList.innerHTML = listHtml;
+        }
+        
+        // Corrected and expanded game data
+        const games = {
+            'class6': {
+                math: {
+                    title: 'Math Mania - Class 6',
+                    description: 'Solve the problem as quickly as you can!',
+                    generateQuestion: (difficulty) => {
+                        let num1, num2, op;
+                        if (difficulty === 'easy') {
+                             num1 = Math.floor(Math.random() * 50) + 10;
+                             num2 = Math.floor(Math.random() * 20) + 5;
+                             op = '+';
+                        } else if (difficulty === 'medium') {
+                            num1 = Math.floor(Math.random() * 100) + 50;
+                            num2 = Math.floor(Math.random() * 50) + 20;
+                            op = '-';
+                        } else {
+                            num1 = Math.floor(Math.random() * 10) + 1;
+                            num2 = Math.floor(Math.random() * 10) + 1;
+                            op = '*';
+                        }
+                        const question = `${num1} ${op} ${num2}`;
+                        const answer = eval(question).toString();
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 6',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['TABLE', 'CHAIR', 'PENCIL', 'RULER', 'SCHOOL', 'FRIEND', 'APPLE', 'HOUSE', 'BALL', 'BOOK'],
+                        medium: ['LIBRARY', 'COMPUTER', 'SUBJECT', 'STUDENT', 'BUILDING', 'GEOGRAPHY', 'HISTORY', 'ENGLISH', 'SCIENCE'],
+                        hard: ['EDUCATIONAL', 'ACADEMIC', 'COMMUNITY', 'ENVIRONMENT', 'TECHNOLOGY', 'BIOLOGY', 'PHYSICS', 'CHEMISTRY']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class6'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 6',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "What planet is known as the Red Planet?", answer: "Mars", options: ["Jupiter", "Venus", "Mars", "Saturn"] },
+                            { question: "How many legs does a spider have?", answer: "Eight", options: ["Six", "Eight", "Ten", "Four"] },
+                            { question: "What is the largest organ in the human body?", answer: "Skin", options: ["Heart", "Liver", "Lungs", "Skin"] }
+                        ],
+                        medium: [
+                            { question: "What is the chemical symbol for water?", answer: "H2O", options: ["CO2", "O2", "NaCl", "H2O"] },
+                            { question: "What is the process of a caterpillar turning into a butterfly called?", answer: "Metamorphosis", options: ["Photosynthesis", "Germination", "Pollination", "Metamorphosis"] }
+                        ],
+                        hard: [
+                            { question: "Which force pulls objects towards the center of the Earth?", answer: "Gravity", options: ["Friction", "Tension", "Gravity", "Magnetism"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class6'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            },
+            'class7': {
+                math: {
+                    title: 'Math Mania - Class 7',
+                    description: 'Solve the problem as quickly as you can!',
+                    generateQuestion: (difficulty) => {
+                        let num1, num2, op;
+                        if (difficulty === 'easy') {
+                            num1 = Math.floor(Math.random() * 50) + 20;
+                            num2 = Math.floor(Math.random() * 50) + 20;
+                            op = '+';
+                        } else if (difficulty === 'medium') {
+                            num1 = Math.floor(Math.random() * 100) + 50;
+                            num2 = Math.floor(Math.random() * 50) + 20;
+                            op = '-';
+                        } else {
+                            num1 = Math.floor(Math.random() * 20) + 1;
+                            num2 = Math.floor(Math.random() * 20) + 1;
+                            op = '*';
+                        }
+                        const question = `${num1} ${op} ${num2}`;
+                        const answer = eval(question).toString();
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 7',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['HISTORY', 'GEOGRAPHY', 'BIOLOGY', 'PHYSICS', 'CHEMISTRY', 'LITERATURE', 'LANGUAGE', 'ART', 'MUSIC'],
+                        medium: ['DEMOCRACY', 'REPUBLIC', 'GOVERNMENT', 'CONSTITUTION', 'INDEPENDENCE', 'COMMUNICATION', 'INNOVATION'],
+                        hard: ['ACCELERATION', 'VELOCITY', 'GRAVITATIONAL', 'MOMENTUM', 'REPRESENTATION', 'DIFFERENTIATION']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class7'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 7',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "What is the process by which plants make their own food?", answer: "Photosynthesis", options: ["Respiration", "Digestion", "Photosynthesis", "Fermentation"] },
+                            { question: "What is the powerhouse of the cell?", answer: "Mitochondria", options: ["Nucleus", "Ribosome", "Cytoplasm", "Mitochondria"] }
+                        ],
+                        medium: [
+                            { question: "What is the name of the process when a liquid turns into a gas?", answer: "Evaporation", options: ["Condensation", "Melting", "Evaporation", "Sublimation"] },
+                            { question: "What is the study of living organisms?", answer: "Biology", options: ["Chemistry", "Physics", "Geology", "Biology"] }
+                        ],
+                        hard: [
+                            { question: "What is the process that splits a large atom into smaller ones?", answer: "Fission", options: ["Fusion", "Fission", "Oxidation", "Reduction"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class7'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            },
+            'class8': {
+                math: {
+                    title: 'Math Mania - Class 8',
+                    description: 'Solve the problem as quickly as you can!',
+                    generateQuestion: (difficulty) => {
+                        let num1, num2, op;
+                        if (difficulty === 'easy') {
+                            num1 = Math.floor(Math.random() * 50) + 20;
+                            num2 = Math.floor(Math.random() * 50) + 20;
+                            op = '+';
+                        } else if (difficulty === 'medium') {
+                            num1 = Math.floor(Math.random() * 100) + 50;
+                            num2 = Math.floor(Math.random() * 50) + 20;
+                            op = '-';
+                        } else {
+                            num1 = Math.floor(Math.random() * 20) + 1;
+                            num2 = Math.floor(Math.random() * 20) + 1;
+                            op = '*';
+                        }
+                        const question = `${num1} ${op} ${num2}`;
+                        const answer = eval(question).toString();
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 8',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['COMPETITION', 'STRATEGY', 'CREATIVITY', 'INNOVATION', 'COMMUNICATION', 'EXPLORATION', 'EXPERIMENT'],
+                        medium: ['COMPREHENSIVE', 'CONSEQUENCE', 'ACCOMMODATE', 'SYNTHESIZE', 'CONSOLIDATE', 'SUBSEQUENTLY'],
+                        hard: ['INDEPENDENT', 'INTERPRETATION', 'INTERACTION', 'CONCENTRATION', 'UNCONVENTIONAL', 'RECONNAISSANCE']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class8'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 8',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "What gas do plants absorb from the atmosphere?", answer: "Carbon dioxide", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"] },
+                            { question: "What is the boiling point of water in Celsius?", answer: "100", options: ["0", "50", "100", "212"] }
+                        ],
+                        medium: [
+                            { question: "What is the name of the long, thin structure that carries electrical impulses away from the neuron's cell body?", answer: "Axon", options: ["Dendrite", "Axon", "Synapse", "Myelin sheath"] },
+                            { question: "Which of the following is an example of a renewable energy source?", answer: "Solar energy", options: ["Coal", "Natural gas", "Petroleum", "Solar energy"] }
+                        ],
+                        hard: [
+                            { question: "What is the process that releases energy from food without using oxygen?", answer: "Anaerobic respiration", options: ["Aerobic respiration", "Anaerobic respiration", "Photosynthesis", "Fermentation"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class8'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            },
+            'class9': {
+                math: {
+                    title: 'Math Mania - Class 9',
+                    description: 'Solve for x!',
+                    generateQuestion: (difficulty) => {
+                        let a, b, result;
+                        if (difficulty === 'easy') {
+                            a = Math.floor(Math.random() * 5) + 2;
+                            b = Math.floor(Math.random() * 10) + 5;
+                            result = Math.floor(Math.random() * 50) + 20;
+                        } else if (difficulty === 'medium') {
+                            a = Math.floor(Math.random() * 10) + 5;
+                            b = Math.floor(Math.random() * 20) + 10;
+                            result = Math.floor(Math.random() * 100) + 50;
+                        } else {
+                            a = Math.floor(Math.random() * 20) + 10;
+                            b = Math.floor(Math.random() * 30) + 15;
+                            result = Math.floor(Math.random() * 200) + 100;
+                        }
+                        const question = `${a}x + ${b} = ${result}`;
+                        const answer = ((result - b) / a).toString();
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 9',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['ABUNDANT', 'TRANSPARENT', 'DETERMINE', 'CONSEQUENCES', 'INNOVATION', 'COMMENDABLE', 'DISTINGUISH'],
+                        medium: ['ACCURATE', 'COMPLICATED', 'PREDICTABLE', 'RESPECTFUL', 'SIGNIFICANT', 'ESTABLISHMENT', 'TRANSFORMATION'],
+                        hard: ['UNPREDICTABLE', 'ACCOMPLISHMENT', 'ACQUIESCENT', 'CONSCIENTIOUS', 'DISINTERESTED', 'INCOMPREHENSIBLE']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class9'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 9',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "What is the unit of force in the SI system?", answer: "Newton", options: ["Watt", "Joule", "Pascal", "Newton"] },
+                            { question: "Which organ produces insulin?", answer: "Pancreas", options: ["Liver", "Kidney", "Stomach", "Pancreas"] }
+                        ],
+                        medium: [
+                            { question: "What is the process of splitting light into its constituent colors?", answer: "Dispersion", options: ["Reflection", "Refraction", "Dispersion", "Diffraction"] },
+                            { question: "What is the chemical name for table salt?", answer: "Sodium Chloride", options: ["Potassium Chloride", "Sodium Bicarbonate", "Sodium Chloride", "Magnesium Sulfate"] }
+                        ],
+                        hard: [
+                            { question: "What is the maximum number of electrons in the third energy level?", answer: "18", options: ["8", "18", "32", "2"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class9'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            },
+            'class10': {
+                math: {
+                    title: 'Math Mania - Class 10',
+                    description: 'Solve the equation!',
+                    generateQuestion: (difficulty) => {
+                        let a, b, c;
+                        if (difficulty === 'easy') {
+                            a = Math.floor(Math.random() * 5) + 1;
+                            b = Math.floor(Math.random() * 5) + 1;
+                            c = a * b;
+                        } else if (difficulty === 'medium') {
+                            a = Math.floor(Math.random() * 10) + 5;
+                            b = Math.floor(Math.random() * 10) + 5;
+                            c = a * b;
+                        } else {
+                            a = Math.floor(Math.random() * 20) + 10;
+                            b = Math.floor(Math.random() * 20) + 10;
+                            c = a * b;
+                        }
+                        const question = `x² - ${a+b}x + ${c} = 0. Find the roots.`;
+                        const answer = `${a}, ${b}`;
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 10',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['GEOMETRY', 'ALGEBRA', 'TRIGONOMETRY', 'STATISTICS', 'PROBABILITY', 'CALCULUS', 'PHYSICS'],
+                        medium: ['HYPOTHESIS', 'EXPERIMENT', 'OBSERVATION', 'CONCLUSION', 'ASSESSMENT', 'EVALUATION', 'TRANSITION'],
+                        hard: ['PHOTOSYNTHESIS', 'RESPIRATION', 'THERMODYNAMICS', 'ELECTROMAGNETISM', 'SUPERCONDUCTIVITY']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class10'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 10',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "What is the chemical symbol for gold?", answer: "Au", options: ["Ag", "Fe", "Au", "Na"] },
+                            { question: "What is the primary function of red blood cells?", answer: "To carry oxygen", options: ["To fight infection", "To clot blood", "To carry oxygen", "To produce antibodies"] }
+                        ],
+                        medium: [
+                            { question: "Which part of the brain is responsible for balance and coordination?", answer: "Cerebellum", options: ["Cerebrum", "Brainstem", "Thalamus", "Cerebellum"] },
+                            { question: "What kind of reaction produces heat?", answer: "Exothermic", options: ["Endothermic", "Exothermic", "Catalytic", "Neutralization"] }
+                        ],
+                        hard: [
+                            { question: "What is the main energy currency of the cell?", answer: "ATP", options: ["DNA", "RNA", "ATP", "Glucose"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class10'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            },
+            'class11': {
+                math: {
+                    title: 'Math Mania - Class 11',
+                    description: 'Solve the problem!',
+                    generateQuestion: (difficulty) => {
+                        let a, b;
+                        if (difficulty === 'easy') {
+                            a = Math.floor(Math.random() * 5) + 2;
+                            b = Math.floor(Math.random() * 5) + 1;
+                        } else if (difficulty === 'medium') {
+                            a = Math.floor(Math.random() * 10) + 5;
+                            b = Math.floor(Math.random() * 10) + 1;
+                        } else {
+                            a = Math.floor(Math.random() * 20) + 10;
+                            b = Math.floor(Math.random() * 20) + 1;
+                        }
+                        const question = `Integrate $f(x) = ${a}x^${b}$`;
+                        const answer = `${a}/${b+1}x^${b+1}`;
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 11',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['PHILOSOPHY', 'LOGIC', 'ETHICS', 'AESTHETICS', 'EPISTEMOLOGY', 'METAPHYSICS'],
+                        medium: ['PHENOMENOLOGY', 'EXISTENTIALISM', 'PSYCHOANALYTIC', 'DECONSTRUCTION', 'POSTSTRUCTURALISM'],
+                        hard: ['CIRCUMSTANTIAL', 'CONSCIENTIOUSNESS', 'INDIVIDUALISTIC', 'UNCONVENTIONAL', 'TRANSFORMATION']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class11'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 11',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "What is the basic unit of inheritance?", answer: "Gene", options: ["Chromosome", "DNA", "Cell", "Gene"] },
+                            { question: "What is the process of generating electricity by moving a magnet through a coil of wire?", answer: "Electromagnetic induction", options: ["Static electricity", "Electromagnetic induction", "Conduction", "Convection"] }
+                        ],
+                        medium: [
+                            { question: "What is the name of the theory that describes the origin of the universe?", answer: "Big Bang Theory", options: ["Atomic Theory", "Theory of Relativity", "Quantum Theory", "Big Bang Theory"] },
+                            { question: "Which organelle is responsible for protein synthesis?", answer: "Ribosome", options: ["Mitochondria", "Nucleus", "Ribosome", "Endoplasmic Reticulum"] }
+                        ],
+                        hard: [
+                            { question: "What is the phenomenon where a magnet's north pole repels another magnet's north pole?", answer: "Magnetic repulsion", options: ["Magnetic attraction", "Magnetic induction", "Magnetic repulsion", "Magnetic field"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class11'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            },
+            'class12': {
+                math: {
+                    title: 'Math Mania - Class 12',
+                    description: 'Solve the calculus problem.',
+                    generateQuestion: (difficulty) => {
+                        let a, b;
+                        if (difficulty === 'easy') {
+                            a = Math.floor(Math.random() * 5) + 2;
+                            b = Math.floor(Math.random() * 5) + 1;
+                        } else if (difficulty === 'medium') {
+                            a = Math.floor(Math.random() * 10) + 5;
+                            b = Math.floor(Math.random() * 10) + 1;
+                        } else {
+                            a = Math.floor(Math.random() * 20) + 10;
+                            b = Math.floor(Math.random() * 20) + 1;
+                        }
+                        const question = `Find the derivative of $f(x) = ${a}x^${b}$`;
+                        const answer = `${a * b}x^${b - 1}`;
+                        return { question, answer };
+                    }
+                },
+                vocabulary: {
+                    title: 'Vocabulary Voyage - Class 12',
+                    description: 'Unscramble the letters to form a word.',
+                    words: {
+                        easy: ['INTEGRATION', 'DIFFERENTIATION', 'PSYCHOLOGY', 'METAMORPHOSIS', 'BIOLOGICAL', 'STATISTICS', 'EQUILIBRIUM'],
+                        medium: ['REPRESENTATION', 'DETERMINATION', 'ACCOMPLISHMENT', 'TRANSFORMATION', 'SIMULTANEOUSLY', 'QUALITATIVE'],
+                        hard: ['ELECTRODYNAMICS', 'QUANTUM', 'MECHANICS', 'RELATIVITY', 'THERMODYNAMICS', 'EPISTEMOLOGY']
+                    },
+                    generateQuestion: (difficulty) => {
+                        const words = games['class12'].vocabulary.words[difficulty];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        const scrambled = word.split('').sort(() => 0.5 - Math.random()).join('');
+                        return { question: scrambled, answer: word };
+                    }
+                },
+                science: {
+                    title: 'Science Spinner - Class 12',
+                    description: 'Answer the question correctly!',
+                    facts: {
+                        easy: [
+                            { question: "Which law states that energy cannot be created or destroyed?", answer: "Law of Conservation of Energy", options: ["Newton's First Law", "Law of Thermodynamics", "Law of Conservation of Energy", "Law of Gravity"] },
+                            { question: "What is the study of matter and its properties?", answer: "Chemistry", options: ["Physics", "Biology", "Chemistry", "Geology"] }
+                        ],
+                        medium: [
+                            { question: "What is the name of the process that allows a virus to enter a cell?", answer: "Endocytosis", options: ["Exocytosis", "Endocytosis", "Osmosis", "Diffusion"] },
+                            { question: "What is the primary function of the mitochondria in a cell?", answer: "To produce energy", options: ["To store genetic information", "To transport substances", "To produce energy", "To detoxify the cell"] }
+                        ],
+                        hard: [
+                            { question: "What is the name of the process by which a star collapses under its own gravity?", answer: "Gravitational collapse", options: ["Nuclear fusion", "Supernova", "Black hole formation", "Gravitational collapse"] }
+                        ]
+                    },
+                    generateQuestion: (difficulty) => {
+                        const facts = games['class12'].science.facts[difficulty];
+                        const fact = facts[Math.floor(Math.random() * facts.length)];
+                        return { question: fact.question, answer: fact.answer, options: fact.options };
+                    }
+                }
+            }
+        };
+        
+        const difficulties = ['easy', 'medium', 'hard'];
+
+        function showGameScreen() {
+            clearTimeout(gameTimer);
+            // This logic was incorrect and has been fixed to make the difficulty progression more reasonable.
+            const difficultyIndex = Math.min(Math.floor((currentLevel - 1) / 5), difficulties.length - 1);
+            const difficulty = difficulties[difficultyIndex];
+            
+            const gameData = games[currentGrade]?.[currentSubject];
+            if (!gameData) {
+                gameContent.innerHTML = `<p class="text-xl font-bold text-red-500">Error: Game data not found. Please go back and select a game again.</p>`;
+                return;
+            }
+
+            const { question, answer, options } = gameData.generateQuestion(difficulty);
+
+            let optionsHtml = '';
+            if (currentSubject === 'science') {
+                 options.forEach(opt => {
+                     optionsHtml += `<button class="science-option btn btn-secondary m-2 w-full md:w-auto">${opt}</button>`;
+                 });
+            }
+
+            gameContent.innerHTML = `
+                <h2 class="text-3xl font-bold mb-4 text-[#CB4B16]">${gameData.title}</h2>
+                <p class="text-xl mb-6 text-[#657B83]">Level: ${currentLevel} | Score: ${score}</p>
+                <div class="bg-white p-8 rounded-lg shadow-inner w-full">
+                    <p class="text-4xl font-bold mb-6 text-[#586E75]">${question}</p>
+                    ${currentSubject !== 'science' ? `
+                    <input type="text" id="game-answer" class="text-center text-2xl p-2 border-2 border-[#D8D0C0] rounded-lg w-full max-w-xs focus:outline-none focus:border-[#268BD2]" autofocus>
+                    <button id="submit-answer-btn" class="btn btn-primary mt-4">Submit</button>
+                    ` : `
+                    <div class="flex flex-wrap justify-center">${optionsHtml}</div>
+                    `}
+                </div>
+                <p id="feedback-message" class="mt-4 text-lg h-6"></p>
+            `;
+
+            if (currentSubject === 'science') {
+                document.querySelectorAll('.science-option').forEach(btn => {
+                    btn.addEventListener('click', () => handleSubmitAnswer(btn.textContent, answer));
+                });
+            } else {
+                const answerInput = document.getElementById('game-answer');
+                const submitBtn = document.getElementById('submit-answer-btn');
+                
+                answerInput.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') {
+                        handleSubmitAnswer(answerInput.value.trim(), answer);
+                    }
+                });
+                submitBtn.addEventListener('click', () => handleSubmitAnswer(answerInput.value.trim(), answer));
+                answerInput.focus();
+            }
+        }
+        
+        async function handleSubmitAnswer(submittedAnswer, correctAnswer) {
+            const feedback = document.getElementById('feedback-message');
+            const isCorrect = currentSubject === 'vocabulary' ? submittedAnswer.toUpperCase() === correctAnswer.toUpperCase() : submittedAnswer === correctAnswer;
+
+            if (isCorrect) {
+                score++;
+                feedback.textContent = 'Correct!';
+                feedback.style.color = '#859900';
+                currentLevel++;
+                await updateProgress(currentSubject, currentLevel);
+                await updateLeaderboard(score);
+            } else {
+                feedback.textContent = `Oops! The correct answer was ${correctAnswer}.`;
+                feedback.style.color = '#DC322F';
+            }
+            gameTimer = setTimeout(showGameScreen, 1500);
+        }
+
+        document.querySelectorAll('.select-grade').forEach(card => {
+            card.addEventListener('click', () => {
+                currentGrade = card.dataset.grade;
+                gradeSelection.classList.add('hidden');
+                gameSelection.classList.remove('hidden');
+            });
+        });
+
+        document.querySelectorAll('.select-game').forEach(card => {
+            card.addEventListener('click', async () => {
+                currentSubject = card.dataset.subject;
+                const progress = await getProgress();
+                currentLevel = progress.levels[`${currentGrade}_${currentSubject}`] || 1;
+                score = 0; 
+                showGameScreen();
+                gameModal.classList.remove('hidden');
+                gameModal.classList.add('flex');
+            });
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            gameModal.classList.add('hidden');
+            gameModal.classList.remove('flex');
+            clearTimeout(gameTimer);
+        });
+
+        dailyBonusBtn.addEventListener('click', claimDailyBonus);
+        
+        leaderboardBtn.addEventListener('click', () => {
+            fetchLeaderboard();
+            gradeSelection.classList.add('hidden');
+            leaderboardView.classList.remove('hidden');
+        });
+        
+        backFromLeaderboardBtn.addEventListener('click', () => {
+            leaderboardView.classList.add('hidden');
+            gradeSelection.classList.remove('hidden');
+        });
+        
+        backToGradesBtn.addEventListener('click', () => {
+            gameSelection.classList.add('hidden');
+            gradeSelection.classList.remove('hidden');
+        });
+
+        window.addEventListener('load', () => {
+            const offlineIndicator = document.getElementById('offline-indicator');
+            const indicatorText = offlineIndicator.querySelector('span');
+
+            const showIndicator = (message, color) => {
+                indicatorText.textContent = message;
+                offlineIndicator.style.backgroundColor = color;
+                offlineIndicator.style.opacity = '1';
+                setTimeout(() => {
+                    offlineIndicator.style.opacity = '0';
+                }, 3000);
+            };
+
+            if ('serviceWorker' in navigator) {
+                 const serviceWorkerScript = `
+                    const CACHE_NAME = 'learnsphere-cache-v2';
+                    const urlsToCache = [
+                        '/',
+                    ];
+
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    return cache.addAll(urlsToCache);
+                                })
+                        );
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => {
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request);
+                                })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        showIndicator('App is ready for offline use!', '#859900');
+                    }).catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                        showIndicator('Offline mode failed to start.', '#DC322F');
+                    });
+            } else {
+                showIndicator('Offline mode not supported.', '#CB4B16');
+            }
+        });
+    </script>
+</body>
+</html>
